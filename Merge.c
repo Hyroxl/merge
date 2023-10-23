@@ -7,6 +7,8 @@ void merge(int arr[], int l, int m, int r);
 void mergeSort(int arr[],int l, int r);
 int main(int argc, char **argv)
 {
+    remove("randArr.txt");
+    remove("sortedArr.txt");
     int size = atoi(argv[1]) + 1;
     float startTimeRand = (float)clock() / CLOCKS_PER_SEC;
     int randArr[size];
