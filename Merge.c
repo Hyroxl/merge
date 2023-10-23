@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 void swap(int *a, int *b);
-void randomize(int arr[], int n);
+void randomize(int arr[], int *n);
 void merge(int arr[], int l, int m, int r);
 void mergeSort(int arr[],int l, int r);
 int main(int argc, char **argv)
@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     {
         randArr[i] = i;
     }
-    randomize(randArr, size);
+    randomize(randArr, &size);
     float endTimeRand = (float)clock() / CLOCKS_PER_SEC;
     FILE *fptr;
     fptr = fopen("randArr.txt", "w");
@@ -42,7 +42,7 @@ void swap (int *a, int *b)
     *b = temp;
 }
 // A function to generate a random permutation of arr[]
-void randomize ( int arr[], int n )
+void randomize ( int arr[], int *n )
 {
     // Use a different seed value so that we don't get same
     // result each time we run this program
@@ -50,7 +50,7 @@ void randomize ( int arr[], int n )
  
     // Start from the last element and swap one by one. We don't
     // need to run for the first element that's why i > 0
-    for (int i = n -1; i > 0; i--)
+    for (int i = *n -1; i > 0; i--)
     {
         // Pick a random index from 0 to i
         int j = rand() % (i+1);
