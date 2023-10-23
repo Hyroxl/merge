@@ -7,6 +7,7 @@ void merge(int arr[], int l, int m, int r);
 void mergeSort(int arr[],int l, int r);
 int main(int argc, char **argv)
 {
+    float totaltimeStart = (float)clock() / CLOCKS_PER_SEC;
     remove("randArr.txt");
     remove("sortedArr.txt");
     int size = atoi(argv[1]) + 1;
@@ -33,7 +34,9 @@ int main(int argc, char **argv)
     for (int k = 0; k < size; k++){
        fprintf(fptr, "%d\n", randArr[k]);
     }
-    printf("Randomization Time:%f\nSort Time:%f\n", timeElapedRand, timeElapsedMerge);
+    float totalTimeEnd = (float)clock() / CLOCKS_PER_SEC;
+    float timeElapsedTotal = totalTimeEnd - totaltimeStart;
+    printf("Randomization Time:%f\nSort Time:%f\nTotal program execution time:%f\n", timeElapedRand, timeElapsedMerge, timeElapsedTotal);
 }
 
 // A utility function to swap to integers
