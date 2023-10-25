@@ -66,13 +66,13 @@ float runFork(int *id, int *arr[], int *size)
     int min;
     if (id == 0)
     {
-        lim = *size / 4;
+        lim = *size / 2;
         min = 0;
     }
     else
     {
-        lim = *size /2;
-        min - *size / 4;
+        lim = *size;
+        min - *size / 2;
     }
     
     randomize(*arr, size, &lim);
