@@ -7,7 +7,6 @@ void randomize(int arr[], int *n, int* m);
 void merge(int arr[], int l, int m, int r);
 void mergeSort(int *arr[],int l, int r);
 float runFork(int *id,int *arr[], int* size);
-
 int main(int argc, char **argv)
 {
     printf("Do you want the output printed?(on larger datasets this may cause the program to be slower)Y/N:");
@@ -32,9 +31,11 @@ int main(int argc, char **argv)
     }else{
         timeElapsedThread1 = runFork(&id, &randArr, &size);
     }
+
     threadTimeTotal = timeElapsedThread1 + timeElapsedThread2;
     if (id != 0)
     {
+    
         float totalTimeEnd;
         FILE *fptr;
         switch (yOrN)
@@ -52,10 +53,11 @@ int main(int argc, char **argv)
         }
             free(randArr);            
             totalTimeEnd = (float)clock() / CLOCKS_PER_SEC;
-            float timeElapsedTotal = totalTimeEnd - totaltimeStart;
+            float timeElapsedTotal;
+            timeElapsedTotal = totalTimeEnd - totaltimeStart;
             printf("Merge time:%f\nTotal program execution time:%f\n", threadTimeTotal, timeElapsedTotal);
     }
-    return 0;
+            return 0;
 }
 
 float runFork(int *id, int *arr[], int *size)
@@ -72,6 +74,7 @@ float runFork(int *id, int *arr[], int *size)
         lim = *size;
         min - *size / 2;
     }
+    
     randomize(*arr, size, &lim);
     float timeStart = (float)clock() / CLOCKS_PER_SEC;
     mergeSort(arr, min, (lim - 1));
