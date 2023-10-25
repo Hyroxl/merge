@@ -6,8 +6,8 @@ void swap(int *a, int *b);
 void randomize(int arr[], int *n, int* m);
 void merge(int arr[], int l, int m, int r);
 void mergeSort(int *arr[],int l, int r);
-float runFork(int *id,int *arr[], int* size);
-
+float runFork(int *id,int *arr[], int* size, int pc);
+int porc = 0;
 int main(int argc, char **argv)
 {
     printf("Do you want the output printed?(on larger datasets this may cause the program to be slower)Y/N:");
@@ -23,18 +23,39 @@ int main(int argc, char **argv)
         randArr[i] = i;
     }
     int id = fork();
+    int id2 = fork();
+    porc++;
     float timeElapsedThread1;
     float timeElapsedThread2;
+    float timeElapsedThread3;
+    float timeElapsedThread4;
     float threadTimeTotal;
-    if (id == 0)
+    if (id == 0 || getppid() == 0)
     {
-        timeElapsedThread2 = runFork(&id, &randArr, &size);
+        switch (id){
+            case 0:
+                timeElapsedThread2 = runFork(&id, &randArr, &size, 1);
+                break;
+            default:
+                timeElapsedThread3 = runFork(&id2, &randArr, &size, 2);
+                break;
+            }
     }else{
-        timeElapsedThread1 = runFork(&id, &randArr, &size);
+        switch(porc){
+            case 0:
+                timeElapsedThread1 = runFork(&id, &randArr, &size, 1);
+                break;
+            default:
+                timeElapsedThread4 = runFork(&id2, &randArr, &size, 2);
+                break;
+            }
     }
-    threadTimeTotal = timeElapsedThread1 + timeElapsedThread2;
-    if (id != 0)
+
+    threadTimeTotal = timeElapsedThread1 + timeElapsedThread2 + timeElapsedThread3 + timeElapsedThread4;
+    if (id == 0 || getppid() == 0 || id2)
     {
+        return 0;
+    }
         float totalTimeEnd;
         FILE *fptr;
         switch (yOrN)
@@ -52,26 +73,44 @@ int main(int argc, char **argv)
         }
             free(randArr);            
             totalTimeEnd = (float)clock() / CLOCKS_PER_SEC;
-            float timeElapsedTotal = totalTimeEnd - totaltimeStart;
+            float timeElapsedTotal = totaltimeStart - totalTimeEnd;
             printf("Merge time:%f\nTotal program execution time:%f\n", threadTimeTotal, timeElapsedTotal);
-    }
-    return 0;
+            return 0;
 }
 
-float runFork(int *id, int *arr[], int *size)
+float runFork(int *id, int *arr[], int *size, int pc)
 {
     int lim;
     int min;
+    switch (pc)
+    {
+    case 1:
     if (id == 0)
     {
-        lim = *size / 2;
+        lim = *size / 4;
         min = 0;
     }
     else
     {
-        lim = *size;
-        min - *size / 2;
+        lim = *size /2;
+        min - *size / 4;
     }
+        break;
+    
+    case 2:
+        switch (porc){
+            case 0:
+                lim = *size - (*size / 4);
+                min = *size / 2;
+                break;
+            default:
+                lim = *size;
+                min = *size - (*size / 4);
+                break;
+            }
+        break;
+    }
+    
     randomize(*arr, size, &lim);
     float timeStart = (float)clock() / CLOCKS_PER_SEC;
     mergeSort(arr, min, (lim - 1));
