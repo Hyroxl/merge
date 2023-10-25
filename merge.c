@@ -1,68 +1,83 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 void swap(int *a, int *b);
-void randomize(int arr[], int *n);
+void randomize(int arr[], int *n, int* m);
 void merge(int arr[], int l, int m, int r);
 void mergeSort(int *arr[],int l, int r);
+float runFork(int *id,int *arr[], int* size);
+
 int main(int argc, char **argv)
 {
     printf("Do you want the output printed?(on larger datasets this may cause the program to be slower)Y/N:");
     char yOrN;
     scanf("%s", &yOrN);
-    fflush(stdout);
     float totaltimeStart = (float)clock() / CLOCKS_PER_SEC;
     remove("randArr.txt");
     remove("sortedArr.txt");
     int size = atoi(argv[1]) + 1;
-    float startTimeRand = (float)clock() / CLOCKS_PER_SEC;
     int *randArr = malloc(size * sizeof *randArr);
     for (int i = 1; i < size; i++)
     {
         randArr[i] = i;
     }
-    printf("randomizing...");
-    fflush(stdout);
-    randomize(randArr, &size);
-    float endTimeRand = (float)clock() / CLOCKS_PER_SEC;
-    FILE *fptr;
-    switch (yOrN)
+    int id = fork();
+    float timeElapsedThread1;
+    float timeElapsedThread2;
+    float threadTimeTotal;
+    if (id == 0)
     {
-    case 'y':
-    fptr = fopen("randArr.txt", "w");
-    for (int j = 0; j < size; j++){
-        fprintf(fptr, "%d\n", randArr[j]);
+        timeElapsedThread2 = runFork(&id, &randArr, &size);
+    }else{
+        timeElapsedThread1 = runFork(&id, &randArr, &size);
     }
-    fclose(fptr);
-    break;
-    case 'n':
-        break;
-    }
-    float startTimeMerge = (float)clock() / CLOCKS_PER_SEC;
-    printf("\33[2k\rSorting...      ");
-    fflush(stdout);
-    mergeSort(&randArr, 0, size - 1);
-    float endTimeMerge = (float)clock() / CLOCKS_PER_SEC;
-    float timeElapedRand = endTimeRand - startTimeRand;
-    float timeElapsedMerge = endTimeMerge - startTimeMerge;
-    switch (yOrN)
+    threadTimeTotal = timeElapsedThread1 + timeElapsedThread2;
+    if (id != 0)
     {
-    case 'y':
-    fptr = fopen("sortedArr.txt", "w");
-    for (int k = 0; k < size; k++){
-       fprintf(fptr, "%d\n", randArr[k]);
-    }
-    fclose(fptr);
-    break;
-    case 'n':
+        float totalTimeEnd;
+        FILE *fptr;
+        switch (yOrN)
+        {
+        case 'y':
+            fptr = fopen("sortedArr.txt", "w");
+            for (int j = 0; j < size; j++)
+            {
+                fprintf(fptr, "%d\n", randArr[j]);
+            }
+        fclose(fptr);
         break;
+        case 'n':
+        break;
+        }
+            free(randArr);            
+            totalTimeEnd = (float)clock() / CLOCKS_PER_SEC;
+            float timeElapsedTotal = totalTimeEnd - totaltimeStart;
+            printf("Merge time:%f\nTotal program execution time:%f\n", threadTimeTotal, timeElapsedTotal);
     }
-    float totalTimeEnd = (float)clock() / CLOCKS_PER_SEC;
-    free(randArr);
-    float timeElapsedTotal = totalTimeEnd - totaltimeStart;
-    printf("\33[2k\rRandomization Time:%f\nSort Time:%f\nTotal program execution time:%f\n", timeElapedRand, timeElapsedMerge, timeElapsedTotal);
+    return 0;
 }
 
+float runFork(int *id, int *arr[], int *size)
+{
+    int lim;
+    int min;
+    if (id == 0)
+    {
+        lim = *size / 2;
+        min = 0;
+    }
+    else
+    {
+        lim = *size;
+        min - *size / 2;
+    }
+    randomize(*arr, size, &lim);
+    float timeStart = (float)clock() / CLOCKS_PER_SEC;
+    mergeSort(arr, min, (lim - 1));
+    float timeEnd = (float)clock() / CLOCKS_PER_SEC;
+    return timeEnd - timeStart;
+}
 // A utility function to swap to integers
 void swap (int *a, int *b)
 {
@@ -71,7 +86,7 @@ void swap (int *a, int *b)
     *b = temp;
 }
 // A function to generate a random permutation of arr[]
-void randomize ( int arr[], int *n )
+void randomize ( int arr[], int *n , int *m)
 {
     // Use a different seed value so that we don't get same
     // result each time we run this program
@@ -79,7 +94,7 @@ void randomize ( int arr[], int *n )
  
     // Start from the last element and swap one by one. We don't
     // need to run for the first element that's why i > 0
-    for (int i = *n -1; i > 0; i--)
+    for (int i = *n -1; i > *m; i--)
     {
         // Pick a random index from 0 to i
         int j = rand() % (i+1);
