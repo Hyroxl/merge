@@ -9,6 +9,11 @@ void mergeSort(int *arr[],int l, int r);
 float runFork(int *id,int *arr[], int* size);
 int main(int argc, char **argv)
 {
+    if(argc < 2)
+    {
+        printf("please retry with \"merge <VALUE>\"\n");
+       return 1;
+    } 
     printf("Do you want the output printed?(on larger datasets this may cause the program to be slower)Y/N:");
     char yOrN;
     scanf("%s", &yOrN);
